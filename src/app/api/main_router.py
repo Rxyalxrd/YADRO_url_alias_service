@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from .v1 import (
     auth_router,
     url_router,
+    statistic_router,
 )
 
 
@@ -16,5 +17,10 @@ main_router.include_router(
 main_router.include_router(
     url_router,
     prefix="/api/v1",
-    tags=["Url aliases"]
+    tags=["Url aliases"],
+)
+main_router.include_router(
+    statistic_router,
+    prefix="/api/v1",
+    tags=["Monitoring"],
 )

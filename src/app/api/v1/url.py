@@ -1,7 +1,9 @@
 from fastapi import (
     APIRouter,
     Depends,
+    status,
 )
+from fastapi.responses import RedirectResponse
 
 from app.schemas import (
     URLRequest,
@@ -16,6 +18,7 @@ from app.api.dependencies import (
 from app.url import (
     get_unique_short_id,
     add_pair,
+    redirect,
 )
 
 
@@ -25,6 +28,7 @@ router = APIRouter()
 @router.post(
     "/cut_url",
     response_model=None,
+    name="Cut url",
     summary="Создание короткой ссылки",
     description=(
         "Генерирует уникальную короткую ссылку для переданного URL. "
@@ -55,3 +59,45 @@ async def cut_url(
     ret = await add_pair(url.url, short_url, url_repo)
 
     return ret
+
+@router.get(
+    "/deactivate",
+    response_model=None,
+    name="",
+    summary="",
+    description="",
+)
+async def deactivate_short_url():
+    pass
+
+@router.get(
+    "/{short_url}",
+    response_model=None,
+    name="",
+    summary="",
+    description="",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def redirect_to_original(
+    short_url: str,
+    url_repo: URLRepository = Depends(get_url_repository),
+    user: User = Depends(get_current_user),
+) -> RedirectResponse:
+    """
+    Перенаправляет пользователя с короткой ссылки на оригинальный URL.
+
+    Args:
+        short_url (str): Уникальный код короткой ссылки, например "Y8mMtv".
+        url_repo (URLRepository): Репозиторий URL для получения оригинальной ссылки.
+
+    Returns:
+        RedirectResponse: HTTP 307 перенаправление на оригинальный URL.
+
+    """
+
+    url = await redirect(short_url, url_repo)
+    
+    return RedirectResponse(
+        url.original_url,
+        status_code=status.HTTP_303_SEE_OTHER
+    )
