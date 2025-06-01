@@ -10,5 +10,5 @@ __all__ = (
     "Base",
     "get_async_session",
     "settings",
-    "AsyncSessionLocal"
+    "AsyncSessionLocal",
 )

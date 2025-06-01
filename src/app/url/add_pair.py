@@ -1,13 +1,14 @@
 from pydantic import HttpUrl
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dao import URLRepository
 from app.models import URL
+from app.dao import URLRepository
 
 
 async def add_pair(
     original_url: HttpUrl,
     short_url: str,
-    url_repo: URLRepository,
+    session: AsyncSession,
 ) -> URL:
     """
     Добавляет новую пару короткой и оригинальной ссылок в базу данных.
@@ -25,11 +26,11 @@ async def add_pair(
 
     """
 
-    exist = await url_repo.short_url_exists(short_url)
+    exist = await URLRepository.get_by_short_url(short_url, session)
 
     if exist:
         raise ValueError(f"Short URL '{short_url}' уже существует")
 
-    ret = await url_repo.add_url_pair(original_url, short_url)
+    ret = await URLRepository.add_url_pair(original_url, short_url, session)
 
     return ret

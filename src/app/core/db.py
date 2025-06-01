@@ -7,25 +7,18 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import (
     declared_attr,
-    declarative_base,
-    Mapped,
-    mapped_column,
+    as_declarative,
 )
 
-from .settings import settings
+from app.core.settings import settings
 
 
-class PreBase:
+@as_declarative()
+class Base:
     """
     Базовый класс для всех моделей SQLAlchemy.
 
     Этот класс используется как основа для определения моделей в SQLAlchemy.
-    Он автоматически генерирует имя таблицы и первичный ключ.
-
-    Attributes
-    ----------
-    id : id
-        Внешний ключ для таблицы.
 
     Methods
     -------
@@ -40,10 +33,6 @@ class PreBase:
         """
 		Генерация имени таблицы на основе имени класса.
 
-        Parameters
-        ----------
-        None    
-
 		Returns
 		-------
 		str
@@ -53,10 +42,7 @@ class PreBase:
 
         return cls.__name__.lower()
 
-    id: Mapped[int] =  mapped_column(primary_key=True)
 
-
-Base = declarative_base(cls=PreBase)
 engine = create_async_engine(settings.database_url)
 AsyncSessionLocal = async_sessionmaker(bind=engine)
 
@@ -64,10 +50,6 @@ AsyncSessionLocal = async_sessionmaker(bind=engine)
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 	"""
 	Генератор асинхронных сессий для работы с базой данных.
-
-	Parameters
-	----------
-	None
 
 	Yields
 	------

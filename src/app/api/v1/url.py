@@ -1,24 +1,24 @@
 from fastapi import (
     APIRouter,
     Depends,
-    status,
 )
-from fastapi.responses import RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core import get_async_session
 from app.schemas import (
     URLRequest,
     URLResponse,
 )
-from app.models import User
-from app.dao import URLRepository
+from app.models import (
+    User,
+    URL,
+)
 from app.api.dependencies import (
     get_current_user,
-    get_url_repository,
 )
 from app.url import (
-    get_unique_short_id,
+    gen_short_link,
     add_pair,
-    redirect,
 )
 
 
@@ -27,7 +27,7 @@ router = APIRouter()
 
 @router.post(
     "/cut_url",
-    response_model=None,
+    response_model=URLResponse,
     name="Cut url",
     summary="Создание короткой ссылки",
     description=(
@@ -38,9 +38,9 @@ router = APIRouter()
 )
 async def cut_url(
     url: URLRequest,
-    url_repo: URLRepository = Depends(get_url_repository),
     user: User = Depends(get_current_user),
-) -> URLResponse:
+    session: AsyncSession = Depends(get_async_session),
+) -> URL:
     """
     Создаёт короткую ссылку на основе переданного URL.
 
@@ -54,9 +54,12 @@ async def cut_url(
 
     """
 
-    short_url = await get_unique_short_id(url_repo)
+    short_url = await gen_short_link(session)
 
-    ret = await add_pair(url.url, short_url, url_repo)
+    if not short_url:
+        raise ValueError("Отссутсвует short_url")
+
+    ret = await add_pair(url.url, short_url, session)
 
     return ret
 
@@ -70,34 +73,3 @@ async def cut_url(
 async def deactivate_short_url():
     pass
 
-@router.get(
-    "/{short_url}",
-    response_model=None,
-    name="",
-    summary="",
-    description="",
-    status_code=status.HTTP_303_SEE_OTHER
-)
-async def redirect_to_original(
-    short_url: str,
-    url_repo: URLRepository = Depends(get_url_repository),
-    user: User = Depends(get_current_user),
-) -> RedirectResponse:
-    """
-    Перенаправляет пользователя с короткой ссылки на оригинальный URL.
-
-    Args:
-        short_url (str): Уникальный код короткой ссылки, например "Y8mMtv".
-        url_repo (URLRepository): Репозиторий URL для получения оригинальной ссылки.
-
-    Returns:
-        RedirectResponse: HTTP 307 перенаправление на оригинальный URL.
-
-    """
-
-    url = await redirect(short_url, url_repo)
-    
-    return RedirectResponse(
-        url.original_url,
-        status_code=status.HTTP_303_SEE_OTHER
-    )

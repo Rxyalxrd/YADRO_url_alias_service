@@ -1,8 +1,10 @@
 from pydantic import (
     BaseModel,
     EmailStr,
+    Field,
 )
 
+from app.const import MIN_PASSWORD_LENGTH
 
 class RegisterRequest(BaseModel):
     """
@@ -15,7 +17,7 @@ class RegisterRequest(BaseModel):
     """
 
     email: EmailStr
-    password: str
+    password: str = Field(..., ge=MIN_PASSWORD_LENGTH)
 
 
 class TokenResponse(BaseModel):
@@ -24,9 +26,9 @@ class TokenResponse(BaseModel):
 
     Attributes:
         access_token (str): Сгенерированный JWT-токен.
-        token_type (str): Тип токена (по умолчанию 'bearer').
+        token_type (str): Тип токена (по умолчанию 'Bearer').
 
     """
 
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = "Bearer"

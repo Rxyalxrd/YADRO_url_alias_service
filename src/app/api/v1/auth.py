@@ -76,4 +76,4 @@ async def login(
 
     token = await login_user(form_data.username, form_data.password, user_repo)
 
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=token, token_type="bearer")

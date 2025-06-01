@@ -20,18 +20,8 @@ class URLRepository:
 
     """
 
-    def __init__(self, session: AsyncSession):
-        """
-        Инициализация репозитория пользователя.
-
-        Args:
-            session (AsyncSession): Асинхронная сессия SQLAlchemy для работы с БД.
-
-        """
-
-        self.session = session
-
-    async def short_url_exists(self, short_url: str) -> bool:
+    @classmethod
+    async def short_url_exists(cls, short_url: str, session: AsyncSession) -> bool:
         """
         Проверяет, существует ли уже запись с данным short_url.
         Используется для предотвращения коллизий при генерации коротких ссылок.
@@ -46,11 +36,16 @@ class URLRepository:
 
         stmt = select(exists().where(URL.short_url == short_url))
 
-        ret = await self.session.execute(stmt)
+        ret = await session.execute(stmt)
 
         return ret.scalar_one()
 
-    async def get_by_short_url(self, short_url: str) -> URL | None:
+    @classmethod
+    async def get_by_short_url(
+        cls,
+        short_url: str,
+        session: AsyncSession
+    ) -> URL | None:
         """
         Получить объект URL по его короткой ссылке.
 
@@ -68,16 +63,18 @@ class URLRepository:
             .limit(1)
         )
 
-        ret = await self.session.execute(stmt)
+        ret = await session.execute(stmt)
 
         return ret.scalar_one_or_none()
     
+    @classmethod
     async def add_url_pair(
-        self,
+        cls,
         original_url: HttpUrl,
         short_url: str,
+        session: AsyncSession,
         is_activated: bool = True,
-        is_old: bool = False,
+        is_old: bool = False, 
     ) -> URL:
         """
         Добавляет новую пару original_url и short_url в базу данных.
@@ -106,8 +103,8 @@ class URLRepository:
             last_day_clicks=0,
         )
 
-        self.session.add(url)
-        await self.session.commit()
-        await self.session.refresh(url)
+        session.add(url)
+        await session.commit()
+        await session.refresh(url)
 
         return url

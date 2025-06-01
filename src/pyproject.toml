@@ -22,20 +22,17 @@ dependencies = [
     "python-jose[cryptography] (>=3.5.0,<4.0.0)"
 ]
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.group.checker.dependencies]
-mypy = "^1.16.0"
-ruff = "^0.11.12"
-
-[tool.poetry.group.stubs.dependencies]
-types-python-jose = "^3.5.0.20250531"
-types-passlib = "^1.7.7.20250516"
-
 [tool.mypy]
 plugins = ['pydantic.mypy']
 strict = true
 ignore_missing_imports = true
+
+[dependency-groups]
+linter = [
+    "mypy>=1.16.0",
+    "ruff>=0.11.12",
+]
+types = [
+    "types-passlib>=1.7.7.20250601",
+    "types-python-jose>=3.5.0.20250531",
+]
