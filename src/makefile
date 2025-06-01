@@ -28,4 +28,4 @@ makemigration:
 	poetry run alembic revision --autogenerate -m "$(MSG)"
 
 run:
-	poetry run unvicorn src.main:app
+	poetry run uvicorn app.main:app --reload

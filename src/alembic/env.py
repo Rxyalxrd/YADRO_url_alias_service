@@ -4,16 +4,23 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
+from pydantic import ValidationError
 from alembic import context
 
+from app.core import Base, settings
+import app.models # noqa: F401
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = None
+try:
+    config.set_main_option("sqlalchemy.url", settings.database_url)
+except ValidationError as e:
+    raise RuntimeError(f"Некорректные настройки: {e}")
+
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
