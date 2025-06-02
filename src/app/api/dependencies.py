@@ -14,51 +14,16 @@ from app.core import (
     get_async_session,
     settings,
 )
-from app.dao import (
-    UserRepository,
-    URLRepository,
-)
+from app.dao import UserRepository
 from app.models import User
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/jwt/login")
 
 
-async def get_user_repository(
-    session: AsyncSession = Depends(get_async_session),
-) -> UserRepository:
-    """
-    Получение экземпляра UserRepository с асинхронной сессией из FastAPI Depends.
-
-    Args:
-        session (AsyncSession): Асинхронная сессия SQLAlchemy, получаемая через Depends.
-
-    Returns:
-        UserRepository: Репозиторий пользователей с переданной сессией.
-
-    """
-
-    return UserRepository(session)
-
-async def get_url_repository(
-    session: AsyncSession = Depends(get_async_session),
-) -> URLRepository:
-    """
-    Получение экземпляра URLRepository с асинхронной сессией из FastAPI Depends.
-
-    Args:
-        session (AsyncSession): Асинхронная сессия SQLAlchemy, получаемая через Depends.
-
-    Returns:
-        URLRepository: Репозиторий URL с переданной сессией.
-
-    """
-    
-    return URLRepository(session)
-
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    user_repo: UserRepository = Depends(get_user_repository)
+    session: AsyncSession = Depends(get_async_session),
 ) -> User:
     """
     Извлекает текущего аутентифицированного пользователя из JWT-токена.
@@ -87,7 +52,7 @@ async def get_current_user(
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token decode error")
 
-    user = await user_repo.get_by_email(email=email)
+    user = await UserRepository.get_by_email(email, session)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

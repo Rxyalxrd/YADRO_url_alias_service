@@ -14,18 +14,8 @@ class UserRepository:
 
     """
 
-    def __init__(self, session: AsyncSession):
-        """
-        Инициализация репозитория пользователя.
-
-        Args:
-            session (AsyncSession): Асинхронная сессия SQLAlchemy для работы с БД.
-
-        """
-
-        self.session = session
-
-    async def get_by_email(self, email: str) -> User | None:
+    @classmethod
+    async def get_by_email(cls, email: str, session: AsyncSession) -> User | None:
         """
         Получает пользователя по его email из базы данных.
 
@@ -39,11 +29,12 @@ class UserRepository:
 
         stmt = select(User).where(User.email == email)
 
-        result = await self.session.execute(stmt)
+        result = await session.execute(stmt)
 
         return result.scalar_one_or_none()
     
-    async def add_new_user(self, email: str, password: str) -> User | None:
+    @classmethod
+    async def add_new_user(cls, email: str, password: str, session: AsyncSession) -> User | None:
         """
         Добавляет нового пользователя в базу данных с захешированным паролем.
 
@@ -61,9 +52,9 @@ class UserRepository:
             password=hash_password(password)
         )
 
-        self.session.add(stmt)
-        await self.session.commit()
-        await self.session.refresh(stmt)
+        session.add(stmt)
+        await session.commit()
+        await session.refresh(stmt)
 
         return stmt
 

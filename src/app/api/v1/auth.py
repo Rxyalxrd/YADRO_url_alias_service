@@ -3,7 +3,9 @@ from fastapi import (
     Depends,
 )
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core import get_async_session
 from app.schemas import (
     RegisterRequest,
     TokenResponse,
@@ -12,8 +14,6 @@ from app.auth import (
     login_user,
     register_user,
 )
-from app.dao import UserRepository
-from app.api.dependencies import get_user_repository
 
 
 router = APIRouter()
@@ -31,7 +31,7 @@ router = APIRouter()
 )
 async def register(
     data: RegisterRequest,
-    user_repo: UserRepository = Depends(get_user_repository),
+    session: AsyncSession = Depends(get_async_session),
 ) -> TokenResponse:
     """
     Регистрирует нового пользователя.
@@ -45,7 +45,7 @@ async def register(
 
     """
     
-    token = await register_user(data.email, data.password, user_repo)
+    token = await register_user(data.email, data.password, session)
 
     return TokenResponse(access_token=token)
 
@@ -59,8 +59,8 @@ async def register(
     ),
 )
 async def login(
+    session: AsyncSession = Depends(get_async_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
-    user_repo: UserRepository = Depends(get_user_repository),
 ) -> TokenResponse:
     """
     Авторизует пользователя и выдаёт JWT токен.
@@ -74,6 +74,6 @@ async def login(
 
     """
 
-    token = await login_user(form_data.username, form_data.password, user_repo)
+    token = await login_user(form_data.username, form_data.password, session)
 
     return TokenResponse(access_token=token, token_type="bearer")

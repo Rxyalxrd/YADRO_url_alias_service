@@ -6,6 +6,7 @@ from pydantic import (
 
 from app.const import MIN_PASSWORD_LENGTH
 
+
 class RegisterRequest(BaseModel):
     """
     Схема запроса для регистрации нового пользователя.
@@ -17,7 +18,7 @@ class RegisterRequest(BaseModel):
     """
 
     email: EmailStr
-    password: str = Field(..., ge=MIN_PASSWORD_LENGTH)
+    password: str = Field(..., min_length=MIN_PASSWORD_LENGTH)
 
 
 class TokenResponse(BaseModel):

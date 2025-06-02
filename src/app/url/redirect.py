@@ -2,13 +2,19 @@ from fastapi import (
     HTTPException,
     status,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao import URLRepository
+from app.models import URLPair
 
+async def redirect(
+    short_url: str,
+    session: AsyncSession,
+) -> URLPair | None:
 
-async def redirect(short_url: str, url_repo: URLRepository):
+    url = await URLRepository.get_by_short_url(short_url, session)
 
-    url = await url_repo.get_by_short_url(short_url)
+    print(url)
     
     if not url:
         raise HTTPException(

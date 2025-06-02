@@ -1,7 +1,7 @@
 from pydantic import HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import URL
+from app.models import URLPair
 from app.dao import URLRepository
 
 
@@ -9,7 +9,7 @@ async def add_pair(
     original_url: HttpUrl,
     short_url: str,
     session: AsyncSession,
-) -> URL:
+) -> URLPair:
     """
     Добавляет новую пару короткой и оригинальной ссылок в базу данных.
 

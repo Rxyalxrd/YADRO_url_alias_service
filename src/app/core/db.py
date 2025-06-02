@@ -44,7 +44,7 @@ class Base:
 
 
 engine = create_async_engine(settings.database_url)
-AsyncSessionLocal = async_sessionmaker(bind=engine)
+AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

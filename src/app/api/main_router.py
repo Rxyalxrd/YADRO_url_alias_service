@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 
-from .v1 import (
+from app.api.v1 import (
     auth_router,
     url_router,
     statistic_router,
+    redirect_router
 )
 
 
@@ -23,4 +24,7 @@ main_router.include_router(
     statistic_router,
     prefix="/api/v1",
     tags=["Monitoring"],
+)
+main_router.include_router(
+    redirect_router,
 )

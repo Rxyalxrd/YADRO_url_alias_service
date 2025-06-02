@@ -1,8 +1,9 @@
 from fastapi import status
 from fastapi.exceptions import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao import UserRepository
-from .validators import (
+from app.auth.validators import (
     verify_password,
     create_access_token,
 )
@@ -11,7 +12,7 @@ from .validators import (
 async def login_user(
     email: str,
     password: str,
-    user_repo: UserRepository,
+    session: AsyncSession,
 ) -> str:
     """
     Выполняет аутентификацию пользователя и возвращает JWT-токен доступа.
@@ -19,7 +20,6 @@ async def login_user(
     Args:
         email (str): Email пользователя для входа.
         password (str): Пароль пользователя в открытом виде.
-        user_repo (UserRepository): Репозиторий пользователей для доступа к данным.
 
     Raises:
         HTTPException: 
@@ -31,7 +31,7 @@ async def login_user(
 
     """
 
-    user = await user_repo.get_by_email(email)
+    user = await UserRepository.get_by_email(email, session)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -40,10 +40,11 @@ async def login_user(
 
     return create_access_token({"sub": user.email})
 
+
 async def register_user(
     email: str,
     password: str,
-    user_repo: UserRepository
+    session: AsyncSession,
 ) -> str:
     """
     Регистрирует нового пользователя и возвращает JWT-токен доступа.
@@ -62,7 +63,7 @@ async def register_user(
 
     """
 
-    new_user = await user_repo.add_new_user(email, password)
+    new_user = await UserRepository.add_new_user(email, password, session)
 
     if new_user is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Внутренняя ошибка")

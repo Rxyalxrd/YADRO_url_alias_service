@@ -4,9 +4,9 @@ from fastapi import (
     Depends,
     status,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dao import URLRepository
-from app.api.dependencies import get_url_repository
+from app.core import get_async_session
 from app.url import redirect
 
 
@@ -15,15 +15,12 @@ router = APIRouter()
 
 @router.get(
     "/{short_url}",
-    response_model=None,
-    name="",
-    summary="",
-    description="",
+    include_in_schema=False,
     status_code=status.HTTP_307_TEMPORARY_REDIRECT
 )
 async def redirect_to_original(
     short_url: str,
-    url_repo: URLRepository = Depends(get_url_repository),
+    session: AsyncSession = Depends(get_async_session),
 ) -> RedirectResponse:
     """
     Перенаправляет пользователя с короткой ссылки на оригинальный URL.
@@ -37,9 +34,9 @@ async def redirect_to_original(
 
     """
 
-    url = await redirect(short_url, url_repo)
+    url = await redirect(short_url, session)
     
     return RedirectResponse(
         url.original_url,
-        status_code=status.HTTP_307_TEMPORARY_REDIRECT
+        status_code=status.HTTP_303_SEE_OTHER,
     )

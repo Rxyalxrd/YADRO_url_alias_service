@@ -6,8 +6,8 @@ from sqlalchemy import (
 )
 
 from app.models import (
-    URL,
-    ClickStat,
+    URLPair,
+    URLPairStat,
 )
 
 
@@ -34,7 +34,7 @@ class URLRepository:
 
         """
 
-        stmt = select(exists().where(URL.short_url == short_url))
+        stmt = select(exists().where(URLPair.short_url == short_url))
 
         ret = await session.execute(stmt)
 
@@ -45,7 +45,7 @@ class URLRepository:
         cls,
         short_url: str,
         session: AsyncSession
-    ) -> URL | None:
+    ) -> URLPair | None:
         """
         Получить объект URL по его короткой ссылке.
 
@@ -58,8 +58,8 @@ class URLRepository:
         """
 
         stmt = (
-            select(URL)
-            .where(URL.short_url == short_url)
+            select(URLPair)
+            .where(URLPair.short_url == short_url)
             .limit(1)
         )
 
@@ -75,7 +75,7 @@ class URLRepository:
         session: AsyncSession,
         is_activated: bool = True,
         is_old: bool = False, 
-    ) -> URL:
+    ) -> URLPair:
         """
         Добавляет новую пару original_url и short_url в базу данных.
         Также создаёт связанный ClickStat.
@@ -91,16 +91,17 @@ class URLRepository:
 
         """
 
-        url = URL(
+        urlstat = URLPairStat(
+            last_hour_clicks=0,
+            last_day_clicks=0,
+        )
+
+        url = URLPair(
             original_url=str(original_url),
             short_url=short_url,
             is_activated=is_activated,
             is_old=is_old,
-        )
-
-        url.clickstats = ClickStat(
-            last_hour_clicks=0,
-            last_day_clicks=0,
+            stats=urlstat,
         )
 
         session.add(url)

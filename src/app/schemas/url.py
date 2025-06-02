@@ -16,6 +16,14 @@ class URLRequest(BaseModel):
     url: HttpUrl
 
 
+class ClickStatResponse(BaseModel):
+    last_hour_clicks: int
+    last_day_clicks: int
+
+    class Config:
+        from_attributes = True
+
+
 class URLResponse(BaseModel):
     """
     Схема ответа с данными о сокращённой ссылке.
@@ -30,9 +38,11 @@ class URLResponse(BaseModel):
 
     """
 
-    url: HttpUrl
-    short_url: HttpUrl
+    original_url: HttpUrl
+    short_url: str
     is_activated: bool
     is_old: bool
-    last_hour_clicks: int
-    last_day_clicks: int
+    stats: ClickStatResponse
+
+    class Config:
+        from_attributes = True

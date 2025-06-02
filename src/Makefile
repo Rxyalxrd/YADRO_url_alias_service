@@ -13,7 +13,10 @@ clean:
 	find .. -name ".mypy_cache" -type d -exec rm -r {} +
 
 install:
-	uv sync
+	uv sync --all-groups
+
+install-prod:
+	uv sync 
 
 migrate:
 	alembic upgrade head

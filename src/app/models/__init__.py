@@ -1,9 +1,8 @@
 from .user import User
-from .url import URL
-from .statistics import ClickStat
+from .url import URLPair, URLPairStat
 
 __all__ = (
     "User",
-    "URL",
-    "ClickStat",
+    "URLPair",
+    "URLPairStat",
 )

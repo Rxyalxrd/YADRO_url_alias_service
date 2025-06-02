@@ -1,6 +1,7 @@
 from fastapi import (
     APIRouter,
     Depends,
+    Request,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,13 +12,10 @@ from app.schemas import (
 )
 from app.models import (
     User,
-    URL,
 )
-from app.api.dependencies import (
-    get_current_user,
-)
+from app.api.dependencies import get_current_user
 from app.url import (
-    gen_short_link,
+    gen_short_path,
     add_pair,
 )
 
@@ -38,15 +36,15 @@ router = APIRouter()
 )
 async def cut_url(
     url: URLRequest,
+    request: Request,
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session),
-) -> URL:
+) -> URLResponse:
     """
     Создаёт короткую ссылку на основе переданного URL.
 
     Args:
         url (URLRequest): Входные данные, содержащие исходный URL.
-        url_repo (URLRepository): Репозиторий URL-ов (через Depends).
         user (User): Текущий авторизованный пользователь (получен из токена).
 
     Returns:
@@ -54,14 +52,19 @@ async def cut_url(
 
     """
 
-    short_url = await gen_short_link(session)
+    short_path = await gen_short_path(session)
 
-    if not short_url:
-        raise ValueError("Отссутсвует short_url")
+    if not short_path:
+        raise ValueError("Отсутствует short_url")
 
-    ret = await add_pair(url.url, short_url, session)
+    urlpair = await add_pair(url.url, short_path, session)
 
-    return ret
+    response = URLResponse.model_validate(urlpair).model_copy(
+        update={"short_url": f"{request.base_url}{urlpair.short_url}"}
+    )
+
+    return response
+
 
 @router.get(
     "/deactivate",

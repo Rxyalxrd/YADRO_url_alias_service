@@ -8,7 +8,8 @@ from app.const import SHORT_LINK_LEN
 from app.dao import URLRepository
 
 
-async def gen_short_link(
+async def gen_short_path(
+    
     session: AsyncSession,
     length=SHORT_LINK_LEN,
 ) -> str | None:
@@ -29,16 +30,13 @@ async def gen_short_link(
 
     while True:
 
-
         characters = string.ascii_letters + string.digits
-        gen_short_url = ''.join(
-            random.choice(characters) for _, _ in enumerate(range(length))
-        )
+        short_path = ''.join(random.sample(characters, length))
 
-        exist = await URLRepository.get_by_short_url(gen_short_url, session)
+        exist = await URLRepository.get_by_short_url(short_path, session)
 
         if not exist:
-            return gen_short_url
+            return short_path
         
         count += 1
 
