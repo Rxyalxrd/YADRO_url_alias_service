@@ -1,19 +1,58 @@
+from typing import Sequence
+
 from fastapi import (
     APIRouter,
+    Depends,
+    Request,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models import User
+from app.schemas import URLResponse
+from app.core import get_async_session
+from app.dao import URLRepository
+from app.api.dependencies import get_current_user
 
 router = APIRouter()
 
 
 @router.get(
-    "/created_short_url",
+    "/last_clicks",
 )
-async def created_short_url():
+async def redirect_short_url(
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(get_current_user),
+):
     pass
 
 @router.get(
-    "/redirect_short_url",
+    "/all_crated_links",
+    response_model=list[URLResponse],
+    summary="Получить все созданные ссылки",
+    description=(
+        "Возвращает список всех URL-пар, которые были созданы сервисом. "
+        "Поддерживается опциональная фильтрация по статусу активности и пагинация."
+    ),
 )
-async def redirect_short_url():
-    pass
+async def all_crated_links(
+    request: Request,
+    is_activated: bool = True,
+    limit: int = 10,
+    offset: int = 0,
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(get_current_user),
+) -> Sequence[URLResponse]:
+    
+    ret = await URLRepository.get_all(
+        session=session,
+        is_activated=is_activated,
+        limit=limit,
+        offset=offset,
+    )
+
+    return [
+        URLResponse.model_validate(item).model_copy(
+            update={"short_url": f"{request.base_url}{item.short_url}"}
+        )
+        for item in ret
+    ]

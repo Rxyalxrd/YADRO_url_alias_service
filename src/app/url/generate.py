@@ -9,7 +9,6 @@ from app.dao import URLRepository
 
 
 async def gen_short_path(
-    
     session: AsyncSession,
     length=SHORT_LINK_LEN,
 ) -> str | None:

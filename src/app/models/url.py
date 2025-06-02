@@ -26,7 +26,7 @@ class URLPair(Base):
         back_populates="url",
         uselist=False,
         cascade="all, delete-orphan",
-        lazy='subquery',
+        lazy="subquery",
     )
 
 

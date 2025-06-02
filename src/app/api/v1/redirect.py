@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get(
     "/{short_url}",
     include_in_schema=False,
-    status_code=status.HTTP_307_TEMPORARY_REDIRECT
+    status_code=status.HTTP_303_SEE_OTHER,
 )
 async def redirect_to_original(
     short_url: str,
@@ -30,13 +30,15 @@ async def redirect_to_original(
         url_repo (URLRepository): Репозиторий URL для получения оригинальной ссылки.
 
     Returns:
-        RedirectResponse: HTTP 307 перенаправление на оригинальный URL.
+        RedirectResponse: HTTP 303 перенаправление на оригинальный URL.
 
     """
 
     url = await redirect(short_url, session)
-    
-    return RedirectResponse(
-        url.original_url,
-        status_code=status.HTTP_303_SEE_OTHER,
-    )
+
+    print(url.original_url)
+
+    # return RedirectResponse(
+    #     url.original_url,
+    #     status_code=status.HTTP_303_SEE_OTHER,
+    # )

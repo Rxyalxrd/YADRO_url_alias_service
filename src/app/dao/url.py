@@ -1,8 +1,12 @@
+from typing import Sequence
+
 from pydantic import HttpUrl
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
     select,
     exists,
+    update,
 )
 
 from app.models import (
@@ -59,8 +63,8 @@ class URLRepository:
 
         stmt = (
             select(URLPair)
+            .options(selectinload(URLPair.stats))  # загружаем stats сразу
             .where(URLPair.short_url == short_url)
-            .limit(1)
         )
 
         ret = await session.execute(stmt)
@@ -94,7 +98,7 @@ class URLRepository:
         urlstat = URLPairStat(
             last_hour_clicks=0,
             last_day_clicks=0,
-        )
+        ) # type: ignore
 
         url = URLPair(
             original_url=str(original_url),
@@ -102,10 +106,66 @@ class URLRepository:
             is_activated=is_activated,
             is_old=is_old,
             stats=urlstat,
-        )
+        ) # type: ignore
 
         session.add(url)
         await session.commit()
         await session.refresh(url)
 
         return url
+
+    @classmethod
+    async def increment_clicks(
+        cls,
+        url_id: int,
+        session: AsyncSession,
+    ) -> None:
+        """
+        Увеличивает поля last_hour_clicks и last_day_clicks на 1 для записи URLPair с данным id.
+        """
+        stmt = (
+            update(URLPairStat)
+            .where(URLPairStat.url_id == url_id)
+            .values(
+                last_hour_clicks=URLPairStat.last_hour_clicks + 1,
+                last_day_clicks=URLPairStat.last_day_clicks + 1,
+            )
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+    @classmethod
+    async def get_all(
+        cls,
+        session: AsyncSession,
+        is_activated: bool | None = None,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> Sequence["URLPair"]:
+
+        stmt = select(URLPair)
+
+        if is_activated is not None:
+            stmt = stmt.where(URLPair.is_activated == is_activated)
+
+        stmt = stmt.limit(limit).offset(offset)
+
+        ret = await session.execute(stmt)
+
+        return ret.scalars().all()
+    
+    @classmethod
+    async def deactivate_link(
+        cls,
+        short_code: str,
+        session: AsyncSession,
+    ) -> None:
+        
+        stmt = (
+            update(URLPair)
+            .where(URLPair.short_url == short_code)
+            .values(is_activated=False)
+        )
+
+        await session.execute(stmt)
+        await session.commit()

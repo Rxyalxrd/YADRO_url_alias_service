@@ -2,7 +2,9 @@ from fastapi import (
     APIRouter,
     Depends,
     Request,
+    status,
 )
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import get_async_session
@@ -10,13 +12,12 @@ from app.schemas import (
     URLRequest,
     URLResponse,
 )
-from app.models import (
-    User,
-)
+from app.models import User
 from app.api.dependencies import get_current_user
 from app.url import (
     gen_short_path,
     add_pair,
+    deactivate_url,
 )
 
 
@@ -66,13 +67,20 @@ async def cut_url(
     return response
 
 
-@router.get(
-    "/deactivate",
+@router.patch(
+    "/deactivate/{short_url}",
+    name="Деактивировать ссылку",
+    summary="Деактивирует короткую ссылку",
+    description="Устанавливает флаг `is_activated=False` для указанной сокращённой ссылки.",
     response_model=None,
-    name="",
-    summary="",
-    description="",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
-async def deactivate_short_url():
-    pass
+async def deactivate_short_url(
+    short_code: str,
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(get_current_user),
+) -> Response:
+    
+    await deactivate_url(short_code, session)
 
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

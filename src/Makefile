@@ -12,7 +12,7 @@ clean:
 	find .. -name ".ruff_cache" -type d -exec rm -r {} +
 	find .. -name ".mypy_cache" -type d -exec rm -r {} +
 
-install:
+install-dev:
 	uv sync --all-groups
 
 install-prod:
