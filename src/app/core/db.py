@@ -1,5 +1,6 @@
 from typing import AsyncGenerator
 
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.ext.asyncio import (
 	AsyncSession,
 	create_async_engine,
@@ -14,7 +15,7 @@ from app.core.settings import settings
 
 
 @as_declarative()
-class Base:
+class Base(AsyncAttrs):
     """
     Базовый класс для всех моделей SQLAlchemy.
 
@@ -44,7 +45,7 @@ class Base:
 
 
 engine = create_async_engine(settings.database_url)
-AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession)
+AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

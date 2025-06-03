@@ -1,4 +1,6 @@
-from sqlalchemy import ForeignKey, String
+import datetime as dt
+
+from sqlalchemy import ForeignKey, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core import Base
@@ -21,11 +23,16 @@ class URLPair(Base):
     original_url: Mapped[str] = mapped_column(nullable=False)
     is_activated: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_old: Mapped[bool] = mapped_column(default=False, nullable=False)
+    expires_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=30), # days=1
+        nullable=False,
+    )
 
     stats: Mapped["URLPairStat"] = relationship(
         back_populates="url",
         uselist=False,
-        cascade="all, delete-orphan",
+        cascade="all",
         lazy="subquery",
     )
 
@@ -52,5 +59,6 @@ class URLPairStat(Base):
 
     url: Mapped["URLPair"] = relationship(
         back_populates="stats",
-        uselist=False
+        uselist=False,
+        lazy="subquery",
     )

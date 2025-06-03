@@ -17,7 +17,7 @@ from app.api.dependencies import get_current_user
 
 router = APIRouter()
 
-
+# Выборка статистики по переходам (по ссылкам) в формате (и в порядке от самых посещаемых к менее посещаемым)
 class Period(str, Enum):
     hour = "hour"
     day = "day"

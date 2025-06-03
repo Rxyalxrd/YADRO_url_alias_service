@@ -8,7 +8,10 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 
-from app.const import SHORT_LINK_LEN
+from app.const import (
+    SHORT_LINK_LEN,
+    MAX_TRY_TO_GEN_SHORT_URL,
+)
 from app.dao import URLRepository
 
 
@@ -57,6 +60,6 @@ async def gen_short_path(
         
         count += 1
 
-        if count > 1000:
+        if count > MAX_TRY_TO_GEN_SHORT_URL:
             logger.warning("Превышено количество попыток генерации короткого url.")
             raise TimeoutError("Превышено количество попыток генерации короткого url.")

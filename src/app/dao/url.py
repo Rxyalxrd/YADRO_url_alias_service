@@ -1,7 +1,6 @@
 from typing import Sequence
 
 from pydantic import HttpUrl
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
     select,
@@ -63,7 +62,6 @@ class URLRepository:
 
         stmt = (
             select(URLPair)
-            .options(selectinload(URLPair.stats))  # загружаем stats сразу
             .where(URLPair.short_url == short_url)
         )
 
@@ -123,6 +121,7 @@ class URLRepository:
         """
         Увеличивает поля last_hour_clicks и last_day_clicks на 1 для записи URLPair с данным id.
         """
+
         stmt = (
             update(URLPairStat)
             .where(URLPairStat.url_id == url_id)
@@ -131,6 +130,7 @@ class URLRepository:
                 last_day_clicks=URLPairStat.last_day_clicks + 1,
             )
         )
+
         await session.execute(stmt)
         await session.commit()
 

@@ -34,7 +34,7 @@ class UserRepository:
         return result.scalar_one_or_none()
     
     @classmethod
-    async def add_new_user(cls, email: str, password: str, session: AsyncSession) -> User | None:
+    async def add_new_user(cls, email: str, password: str, session: AsyncSession) -> User:
         """
         Добавляет нового пользователя в базу данных с захешированным паролем.
 
@@ -50,7 +50,7 @@ class UserRepository:
         stmt = User(
             email=email,
             password=hash_password(password)
-        )
+        ) # type: ignore
 
         session.add(stmt)
         await session.commit()

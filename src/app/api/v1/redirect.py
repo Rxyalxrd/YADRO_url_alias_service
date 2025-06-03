@@ -36,9 +36,7 @@ async def redirect_to_original(
 
     url = await redirect(short_url, session)
 
-    print(url.original_url)
-
-    # return RedirectResponse(
-    #     url.original_url,
-    #     status_code=status.HTTP_303_SEE_OTHER,
-    # )
+    return RedirectResponse(
+        url.original_url,
+        status_code=status.HTTP_303_SEE_OTHER,
+    )

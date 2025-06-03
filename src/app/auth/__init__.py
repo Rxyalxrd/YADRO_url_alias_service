@@ -1,4 +1,7 @@
-from .auth import login_user, register_user
+from .auth import (
+    login_user,
+    register_user,
+)
 from .validators import (
     verify_password,
     create_access_token,

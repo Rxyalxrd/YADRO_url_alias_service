@@ -41,7 +41,7 @@ async def redirect(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Ошибка получения короткой ссылки",
         )
-
+    logger.debug(f"url = {url}")
     if not url:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

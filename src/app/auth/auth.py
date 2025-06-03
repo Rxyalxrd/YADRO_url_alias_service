@@ -36,6 +36,7 @@ async def login_user(
 
     try:
         user = await UserRepository.get_by_email(email, session)
+
     except Exception:
         logger.critical("Не удалось получить пользователя по email")
         raise HTTPException(
