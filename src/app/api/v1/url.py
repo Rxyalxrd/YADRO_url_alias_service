@@ -76,11 +76,11 @@ async def cut_url(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def deactivate_short_url(
-    short_code: str,
+    short_url: str,
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(get_current_user),
 ) -> Response:
     
-    await deactivate_url(short_code, session)
+    await deactivate_url(short_url, session)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

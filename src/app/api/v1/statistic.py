@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Sequence
 
 from fastapi import (
@@ -13,17 +14,13 @@ from app.core import get_async_session
 from app.dao import URLRepository
 from app.api.dependencies import get_current_user
 
+
 router = APIRouter()
 
 
-@router.get(
-    "/last_clicks",
-)
-async def redirect_short_url(
-    session: AsyncSession = Depends(get_async_session),
-    user: User = Depends(get_current_user),
-):
-    pass
+class Period(str, Enum):
+    hour = "hour"
+    day = "day"
 
 @router.get(
     "/all_crated_links",

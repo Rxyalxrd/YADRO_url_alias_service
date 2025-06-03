@@ -1,5 +1,8 @@
+from sys import exit
+
 from pydantic import (
     PostgresDsn,
+    ValidationError,
 )
 from pydantic_settings import (
     BaseSettings,
@@ -7,6 +10,7 @@ from pydantic_settings import (
 )
 from loguru import logger
 
+from app.const import EXIT_CODE_FOR_SETTINGS
 
 class FastAPISettings(BaseSettings):
     """
@@ -84,9 +88,19 @@ class PostgreSQLSettings(BaseSettings):
 
 
 
-class HashSettings(BaseSettings):
+class JWTSettings(BaseSettings):
     """
-    
+    Настройки генерации токенов.
+
+    Attributes
+    ----------
+        hash_secret_key: str
+            Секретный ключ для генерации токенов.
+        algorithm: str
+            Алгоритм шифрования JWT.
+        access_token_expire_minutes: int
+            Время жизни токена в минутах.
+
     """
 
     hash_secret_key: str
@@ -96,7 +110,7 @@ class HashSettings(BaseSettings):
 class Settings(
     FastAPISettings,
     PostgreSQLSettings,
-    HashSettings,
+    JWTSettings,
 ):
     """
     Основные настройки проекта, загружаемые из .env файла.
@@ -113,6 +127,9 @@ class Settings(
         env_file_encoding="utf-8",
     )
 
-
-settings = Settings() # type: ignore
-logger.info("Настройки успешно загружены.")
+try:
+    settings = Settings() # type: ignore
+    logger.success("Загрузка настроек прошла успешно...")
+except ValidationError:
+    logger.error("Ошибка в загрузке настроек, проверьте .env")
+    exit(EXIT_CODE_FOR_SETTINGS)

@@ -1,6 +1,7 @@
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from loguru import logger
 
 from app.dao import UserRepository
 from app.auth.validators import (
@@ -31,12 +32,29 @@ async def login_user(
 
     """
 
-    user = await UserRepository.get_by_email(email, session)
+    logger.info("Начинаем аутентификацию пользователя.")
+
+    try:
+        user = await UserRepository.get_by_email(email, session)
+    except Exception:
+        logger.critical("Не удалось получить пользователя по email")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось получить пользователя по email",
+        )
 
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден")
+
     if not verify_password(password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверный пароль"
+        )
+    
+    logger.info("Генерируем токен для пользователя")
 
     return create_access_token({"sub": user.email})
 
@@ -55,17 +73,25 @@ async def register_user(
         user_repo (UserRepository): Репозиторий пользователей для доступа к данным.
 
     Raises:
-        HTTPException:
-            - 500, если произошла внутренняя ошибка при сохранении пользователя.
+        HTTPException: 500 - Внутренняя ошибка при сохранении пользователя.
 
     Returns:
         str: JWT-токен доступа, содержащий email зарегистрированного пользователя в поле "sub".
 
     """
 
-    new_user = await UserRepository.add_new_user(email, password, session)
+    logger.info("Начинаем регистрацию пользователя")
+    
+    try:
+        new_user = await UserRepository.add_new_user(email, password, session)
 
-    if new_user is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Внутренняя ошибка")
+    except Exception:
+        logger.critical("Ошибка регистрации")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ошибка регистрации",
+        )
+    
+    logger.info("Генерируем токен для пользователя")
 
     return create_access_token({"sub": new_user.email})

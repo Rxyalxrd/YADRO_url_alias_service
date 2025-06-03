@@ -59,8 +59,8 @@ async def register(
     ),
 )
 async def login(
-    session: AsyncSession = Depends(get_async_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
+    session: AsyncSession = Depends(get_async_session),
 ) -> TokenResponse:
     """
     Авторизует пользователя и выдаёт JWT токен.

@@ -1,6 +1,10 @@
 import random
 import string
 
+from fastapi import (
+    HTTPException,
+    status,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 
@@ -20,10 +24,15 @@ async def gen_short_path(
         length (int, optional): Длина генерируемой строки. 
             По умолчанию берётся значение из константы GENERATE_SHORT_LINK.
 
+    Raises:
+        HTTPException: 500 - Внутренняя ошибка при проверке существования короткой ссылки.
+
     Returns:
         str: Уникальный короткий идентификатор для сокращённой ссылки.
 
     """
+
+    logger.info("Начинаем генерировать short_path")
 
     count = 0
 
@@ -32,15 +41,22 @@ async def gen_short_path(
         characters = string.ascii_letters + string.digits
         short_path = ''.join(random.sample(characters, length))
 
-        exist = await URLRepository.get_by_short_url(short_path, session)
+        try:
+            exist = await URLRepository.get_by_short_url(short_path, session)
+
+        except Exception:
+            logger.critical("Ошибка проверки на существование короткой ссылки")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Ошибка проверки на существование короткой ссылки",
+            )
 
         if not exist:
+            logger.success("short_path создан")
             return short_path
         
         count += 1
 
         if count > 1000:
             logger.warning("Превышено количество попыток генерации короткого url.")
-            break
-        
-    return None
+            raise TimeoutError("Превышено количество попыток генерации короткого url.")

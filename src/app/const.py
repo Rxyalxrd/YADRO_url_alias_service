@@ -8,3 +8,4 @@ EMAIL_REGEX: Pattern[str] = re.compile(
 
 SHORT_LINK_LEN: int = 6
 MIN_PASSWORD_LENGTH: int = 8
+EXIT_CODE_FOR_SETTINGS: int = 1 
