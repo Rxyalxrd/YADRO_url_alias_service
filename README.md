@@ -19,10 +19,10 @@
 
 | Компонент         | Технология             |
 | ----------------- | ---------------------- |
-| Язык              | Python 3.11 (PEP-8)    |
+| Язык              | Python 3.10+           |
 | Web Framework     | FastAPI                |
 | БД                | PostgreSQL             |
-| ORM               | SQLAlchemy 2 + Alembic |
+| ORM               | SQLAlchemy             |
 | Аутентификация    | JWT (OAuth2)           |
 | Планировщик задач | APScheduler            |
 | Логирование       | Loguru                 |
@@ -47,14 +47,17 @@ docker-compose up --build
 ```
 
 ### 🫐 Локальный запуск
-
-```bash
-sudo pacman -S uv или pip install uv
-cd src
-make install-dev
-make migrate
-make run
-```
+  1. Установить [uv](https://docs.astral.sh/uv/getting-started/installation)
+  2. Установить зависимости
+        ```bash
+        cd src
+        make install-dev
+        make migrate
+        ```
+  3. Запустить приложение
+     ```bash
+     make run
+     ```
 
 ---
 
