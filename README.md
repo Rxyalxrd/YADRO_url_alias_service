@@ -36,7 +36,7 @@
 ### 🔧 Клонирование проекта
 
 ```bash
-git clone https://github.com/Rxyalxrd/YADRO_url_alias_service.git
+git clone git@github.com:Rxyalxrd/YADRO_url_alias_service.git
 cd YADRO_url_alias_service
 ```
 
