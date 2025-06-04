@@ -1,20 +1,22 @@
-FROM python:3.12-alpine
+FROM python:3.12.11-slim
 
-# Установка менеджера зависимостей uv
-RUN pip install --no-cache-dir uv
-
-# Установка рабочей директории
 WORKDIR /app
 
-# Копирование зависимостей
-COPY pyproject.toml uv.lock* ./
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Установка зависимостей приложения
-RUN uv pip install --system --no-cache
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
+ENV PATH="/root/.local/bin:$PATH"
 
-# Копирование исходного кода
+COPY pyproject.toml poetry.lock* ./
+
+RUN poetry config virtualenvs.in-project true
+
+RUN poetry install --no-root
+
 COPY . .
 
-# Команда запуска Uvicorn-сервера
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -19,20 +19,17 @@ clean:
 	find .. -name ".ruff_cache" -type d -exec rm -r {} +
 	find .. -name ".mypy_cache" -type d -exec rm -r {} +
 
-install-dev:
-	uv sync --all-groups
-
-install-prod:
-	uv sync 
+install:
+	poetry install --no-root
 
 migrate:
-	alembic upgrade head
+	poetry run alembic upgrade head
 
 downgrade:
-	alembic downgrade -1
+	poetry run alembic downgrade -1
 
 makemigration:
-	alembic revision --autogenerate -m "$(MSG)"
+	poetry run alembic revision --autogenerate -m "$(MSG)"
 
 run:
-	uvicorn app.main:app --reload
+	poetry run uvicorn app.main:app --reload

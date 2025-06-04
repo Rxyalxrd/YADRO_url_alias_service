@@ -13,3 +13,4 @@ EMAIL_REGEX: Pattern[str] = re.compile(
 )
 
 DAILY_JOB: int = 24
+HOURLY_JOB: int = 1
