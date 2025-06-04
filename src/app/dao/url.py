@@ -2,11 +2,13 @@ from typing import Sequence
 
 from pydantic import HttpUrl
 from sqlalchemy import (
+    desc,
     exists,
     select,
     update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.models import (
     URLPair,
@@ -119,7 +121,12 @@ class URLRepository:
         session: AsyncSession,
     ) -> None:
         """
-        Увеличивает поля last_hour_clicks и last_day_clicks на 1 для записи URLPair с данным id.
+        Инкрементирует счётчики кликов за последний час и день для ссылки по её ID.
+
+        Args:
+            url_id (int): Идентификатор укороченной ссылки (URLPair).
+            session (AsyncSession): Асинхронная сессия SQLAlchemy.
+
         """
 
         stmt = (
@@ -141,26 +148,57 @@ class URLRepository:
         is_activated: bool | None = None,
         limit: int = 10,
         offset: int = 0,
+        sort_by_hour_clicks: bool = False,
+        sort_by_day_clicks: bool = False,
     ) -> Sequence["URLPair"]:
+        """
+        Получает список ссылок с опциональной фильтрацией по статусу и сортировкой по кликам.
 
-        stmt = select(URLPair)
+        Args:
+            session (AsyncSession): Асинхронная сессия SQLAlchemy.
+            is_activated (bool | None): Если указано, фильтрует по активности ссылки.
+            limit (int): Максимальное количество ссылок для возврата.
+            offset (int): Количество пропущенных записей (для пагинации).
+            sort_by_hour_clicks (bool): Если True — сортировать по кликам за час (убывание).
+            sort_by_day_clicks (bool): Если True — сортировать по кликам за день (убывание).
+
+        Returns:
+            Sequence[URLPair]: Список объектов URLPair, соответствующих условиям.
+
+        """
+
+        stmt = select(URLPair).options(joinedload(URLPair.stats))
 
         if is_activated is not None:
             stmt = stmt.where(URLPair.is_activated == is_activated)
 
+        if sort_by_hour_clicks:
+            stmt = stmt.join(URLPair.stats).order_by(desc(URLPairStat.last_hour_clicks))
+        elif sort_by_day_clicks:
+            stmt = stmt.join(URLPair.stats).order_by(desc(URLPairStat.last_day_clicks))
+
         stmt = stmt.limit(limit).offset(offset)
 
-        ret = await session.execute(stmt)
+        result = await session.execute(stmt)
 
-        return ret.scalars().all()
-    
+        return result.scalars().all()
+
+        
     @classmethod
     async def deactivate_link(
         cls,
         short_code: str,
         session: AsyncSession,
     ) -> None:
-        
+        """
+        Деактивирует укороченную ссылку (делает её недоступной для переходов) по коду.
+
+        Args:
+            short_code (str): Уникальный идентификатор укороченной ссылки (часть URL).
+            session (AsyncSession): Асинхронная сессия SQLAlchemy.
+
+        """
+
         stmt = (
             update(URLPair)
             .where(URLPair.short_url == short_code)

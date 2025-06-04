@@ -20,6 +20,7 @@ try:
 except ValidationError as e:
     raise RuntimeError(f"Некорректные настройки: {e}")
 
+
 target_metadata = Base.metadata
 
 

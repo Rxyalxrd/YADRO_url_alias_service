@@ -4,7 +4,7 @@ from datetime import (
     timezone,
 )
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler # type: ignore
 from loguru import logger
 from sqlalchemy import update
 
@@ -17,11 +17,28 @@ scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
 @asynccontextmanager
 async def get_session():
+    """
+    Асинхронный контекстный менеджер для получения сессии SQLAlchemy.
+
+    Yields:
+        AsyncSession: Асинхронная сессия базы данных.
+
+    """
+
     async for session in get_async_session():
         yield session
 
 
 async def deactivate_expired_urls():
+    """
+    Плановая задача для деактивации истёкших ссылок.
+
+    Деактивирует все URL, у которых истёк срок действия (expires_at <= now)
+    и которые всё ещё активны (is_activated=True). Также устанавливает is_old=True
+    для дальнейшей фильтрации.
+
+    """
+
     logger.info("Запущена задача деактивации ссылок")
 
     async with get_session() as session:

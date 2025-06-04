@@ -1,8 +1,14 @@
 from sys import exit
 
 from loguru import logger
-from pydantic import PostgresDsn, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import (
+    PostgresDsn,
+    ValidationError,
+)
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict,
+)
 
 from app.const import EXIT_CODE_FOR_SETTINGS
 

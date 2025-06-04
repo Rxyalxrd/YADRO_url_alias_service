@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.validators import (
+from app.auth.security import (
     create_access_token,
     verify_password,
 )

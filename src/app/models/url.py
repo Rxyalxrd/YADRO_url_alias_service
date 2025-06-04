@@ -24,6 +24,7 @@ class URLPair(Base):
         is_activated (bool): Флаг активности ссылки (может ли она перенаправлять).
         is_old (bool): Флаг старой ссылки (для автоудаления или архивирования).
         clickstats (ClickStat): Статистика кликов по данной ссылке (one-to-one).
+
     """
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -54,6 +55,7 @@ class URLPairStat(Base):
         last_hour_clicks (int): Кол-во кликов за последний час.
         last_day_clicks (int): Кол-во кликов за последние сутки.
         url (URL): Обратная связь на модель URL.
+
     """
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -1,6 +1,13 @@
 MSG = ""
 
-.PHONY: clean install install-prod migrate downgrade makemigration run
+.PHONY:
+	downgrade
+	clean
+	install-dev
+	install-prod
+	migrate
+	makemigration
+	run
 
 
 clean:

@@ -7,6 +7,7 @@ from app.api.v1 import (
     url_router,
 )
 
+
 main_router = APIRouter()
 
 main_router.include_router(
@@ -26,4 +27,6 @@ main_router.include_router(
 )
 main_router.include_router(
     redirect_router,
+    prefix="",
+    tags=["Redirect"],
 )

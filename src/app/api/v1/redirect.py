@@ -16,6 +16,14 @@ router = APIRouter()
     "/{short_url}",
     include_in_schema=False,
     status_code=status.HTTP_303_SEE_OTHER,
+    name="Перейти по короткой ссылке",
+    summary="Перенаправление по короткой ссылке",
+    description=(
+        "Обрабатывает переход по короткой ссылке. "
+        "По коду ссылки (например, `Y8mMtv`) находит соответствующий оригинальный URL "
+        "в базе данных и выполняет перенаправление с кодом 303 (See Other) "
+        "на этот URL. Если ссылка недействительна или отключена, будет выброшено исключение."
+    ),
 )
 async def redirect_to_original(
     short_url: str,
