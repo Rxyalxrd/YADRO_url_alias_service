@@ -1,0 +1,25 @@
+name: CI/CD YADRO url aliases
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+
+jobs:
+
+  linter:
+    uses: ./.github/workflows/mypy_check.yml
+
+  style:
+    needs: linter
+    uses: ./.github/workflows/style_check.yml
+
+  security:
+    needs: [linter, style]
+    uses: ./.github/workflows/safety_check.yml
+    secrets:
+      SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}

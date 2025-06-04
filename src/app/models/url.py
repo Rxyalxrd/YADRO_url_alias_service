@@ -42,7 +42,7 @@ class URLPair(Base):
         back_populates="url",
         uselist=False,
         cascade="all",
-        lazy="subquery",
+        lazy="selectin",
     )
 
 
@@ -70,5 +70,5 @@ class URLPairStat(Base):
     url: Mapped["URLPair"] = relationship(
         back_populates="stats",
         uselist=False,
-        lazy="subquery",
+        lazy="selectin",
     )

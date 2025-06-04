@@ -1,0 +1,49 @@
+name: Type checker
+
+on:
+  workflow_call:
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          echo "Current working directory before cd:"
+          pwd
+          pip install poetry
+          echo "Changing directory to src..."
+          cd src
+          echo "Current working directory after cd:"
+          pwd
+          poetry install
+
+      - name: Run mypy on changed files
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+            # Fetch both base and head refs for accurate comparison
+            git fetch origin $BASE_BRANCH --depth=1
+            git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+            CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH..origin/$HEAD_BRANCH -- '*.py')
+          else
+            BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            git fetch origin $BASE_BRANCH --depth=1
+            CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH..HEAD -- '*.py')
+          fi
+
+          if [[ -n "$CHANGED_FILES" ]]; then
+            poetry run mypy $CHANGED_FILES
+          else
+            echo "No Python files changed."
+          fi

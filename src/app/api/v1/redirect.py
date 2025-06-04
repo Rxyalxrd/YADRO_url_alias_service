@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import get_async_session
-from app.url import redirect
+from app.services import redirect
 
 router = APIRouter()
 
@@ -44,6 +44,6 @@ async def redirect_to_original(
     url = await redirect(short_url, session)
 
     return RedirectResponse(
-        url.original_url,
+        await url.awaitable_attrs.original_url,
         status_code=status.HTTP_303_SEE_OTHER,
     )

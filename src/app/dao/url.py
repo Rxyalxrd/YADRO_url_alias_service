@@ -117,7 +117,7 @@ class URLRepository:
     @classmethod
     async def increment_clicks(
         cls,
-        url_id: int,
+        url_obj: URLPair,
         session: AsyncSession,
     ) -> None:
         """
@@ -129,16 +129,10 @@ class URLRepository:
 
         """
 
-        stmt = (
-            update(URLPairStat)
-            .where(URLPairStat.url_id == url_id)
-            .values(
-                last_hour_clicks=URLPairStat.last_hour_clicks + 1,
-                last_day_clicks=URLPairStat.last_day_clicks + 1,
-            )
-        )
+        url_obj.stats.last_day_clicks += 1
+        url_obj.stats.last_hour_clicks += 1
 
-        await session.execute(stmt)
+        session.add(url_obj)
         await session.commit()
 
     @classmethod

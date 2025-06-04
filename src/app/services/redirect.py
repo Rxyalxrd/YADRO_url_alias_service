@@ -63,7 +63,7 @@ async def redirect(
     logger.info("Увеличиваем счетчик кликов")
 
     try:
-        await URLRepository.increment_clicks(url.id, session)
+        await URLRepository.increment_clicks(url, session)
 
     except Exception:
         logger.critical("Ошибка при увеличении кликов")

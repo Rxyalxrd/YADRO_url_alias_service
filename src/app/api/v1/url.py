@@ -16,7 +16,7 @@ from app.schemas import (
     URLRequest,
     URLResponse,
 )
-from app.url import (
+from app.services import (
     add_pair,
     deactivate_url,
     gen_short_path,
