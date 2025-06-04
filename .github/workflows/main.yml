@@ -15,7 +15,6 @@ jobs:
     uses: ./.github/workflows/mypy_check.yml
 
   style:
-    needs: linter
     uses: ./.github/workflows/style_check.yml
 
   security:

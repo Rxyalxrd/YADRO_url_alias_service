@@ -1,27 +1,20 @@
-# --- Stage 1: Build ---
-FROM python:alpine AS builder
+FROM python:3.12-alpine
 
-RUN apk add --no-cache build-base
-
-WORKDIR /app
-
+# Установка менеджера зависимостей uv
 RUN pip install --no-cache-dir uv
 
-COPY pyproject.toml uv.lock* ./
-
-RUN uv pip install --prefix=/install --no-cache
-
-COPY ./src ./src
-
-# --- Stage 2: Runtime ---
-FROM python:alpine
-
+# Установка рабочей директории
 WORKDIR /app
 
+# Копирование зависимостей
+COPY pyproject.toml uv.lock* ./
 
-COPY --from=builder /install /usr/local
+# Установка зависимостей приложения
+RUN uv pip install --system --no-cache
 
-COPY --from=builder /app/src ./src
 
+# Копирование исходного кода
+COPY . .
 
-CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Команда запуска Uvicorn-сервера
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
