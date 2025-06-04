@@ -19,14 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "Current working directory before cd:"
-          pwd
-          pip install poetry
-          echo "Changing directory to src..."
+          pip install uv
           cd src
-          echo "Current working directory after cd:"
-          pwd
-          poetry install
+          uv sync --all-groups
 
       - name: Run mypy on changed files
         run: |
