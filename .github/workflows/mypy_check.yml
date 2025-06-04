@@ -19,9 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install uv
+          pip install poetry
           cd src
-          uv sync --all-groups
+          poetry install --no-root
 
       - name: Run mypy on changed files
         run: |
