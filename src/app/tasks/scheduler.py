@@ -4,14 +4,13 @@ from datetime import (
     timezone,
 )
 
-from sqlalchemy import update
-from loguru import logger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from loguru import logger
+from sqlalchemy import update
 
+from app.const import DAILY_JOB
 from app.core import get_async_session
 from app.models import URLPair
-from app.const import DAILY_JOB
-
 
 scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 

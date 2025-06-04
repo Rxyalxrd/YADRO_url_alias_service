@@ -1,11 +1,12 @@
 from urllib.parse import urlparse
+
 from fastapi import (
     HTTPException,
     status,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import HttpUrl
 from loguru import logger
+from pydantic import HttpUrl
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao import URLRepository
 

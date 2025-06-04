@@ -1,14 +1,13 @@
-from fastapi.responses import RedirectResponse
 from fastapi import (
     APIRouter,
     Depends,
     status,
 )
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import get_async_session
 from app.url import redirect
-
 
 router = APIRouter()
 

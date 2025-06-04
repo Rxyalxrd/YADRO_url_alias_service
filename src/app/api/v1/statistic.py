@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Sequence
 
 from fastapi import (
@@ -8,19 +7,15 @@ from fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import User
-from app.schemas import URLResponse
+from app.api.dependencies import get_current_user
 from app.core import get_async_session
 from app.dao import URLRepository
-from app.api.dependencies import get_current_user
+from app.models import User
+from app.schemas import URLResponse
 
 
 router = APIRouter()
 
-# Выборка статистики по переходам (по ссылкам) в формате (и в порядке от самых посещаемых к менее посещаемым)
-class Period(str, Enum):
-    hour = "hour"
-    day = "day"
 
 @router.get(
     "/all_crated_links",

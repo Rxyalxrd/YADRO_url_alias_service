@@ -1,14 +1,9 @@
-from datetime import (
-    datetime,
-    timedelta,
-    timezone,
-)
+import datetime as dt
 
-from passlib.context import CryptContext
 from jose import jwt
+from passlib.context import CryptContext
 
 from app.core import settings
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -47,7 +42,7 @@ def verify_password(
 
 def create_access_token(
     data: dict,
-    expires_delta: timedelta | None = None
+    expires_delta: dt.timedelta | None = None
 ) -> str:
     """
     Создаёт JWT-токен доступа с указанными данными и временем истечения срока.
@@ -62,10 +57,10 @@ def create_access_token(
     """
 
     expire = (
-        datetime.now(timezone.utc) +
+        dt.datetime.now(dt.timezone.utc) +
         (
             expires_delta or
-            timedelta(minutes=settings.access_token_expire_minutes)
+            dt.timedelta(minutes=settings.access_token_expire_minutes)
             )
     )
     data.update({"exp": expire})

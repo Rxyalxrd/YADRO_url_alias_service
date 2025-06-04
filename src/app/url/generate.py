@@ -5,12 +5,12 @@ from fastapi import (
     HTTPException,
     status,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.const import (
-    SHORT_LINK_LEN,
     MAX_TRY_TO_GEN_SHORT_URL,
+    SHORT_LINK_LEN,
 )
 from app.dao import URLRepository
 

@@ -2,8 +2,8 @@ from fastapi import (
     HTTPException,
     status,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao import URLRepository
 from app.models import URLPair

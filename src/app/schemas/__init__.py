@@ -1,12 +1,5 @@
-from .auth import (
-    TokenResponse,
-    RegisterRequest,
-)
-from .url import (
-    URLResponse,
-    URLRequest,
-)
-
+from .auth import RegisterRequest, TokenResponse
+from .url import URLRequest, URLResponse
 
 __all__ = (
     "TokenResponse",

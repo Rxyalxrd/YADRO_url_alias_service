@@ -1,5 +1,5 @@
-from .user import UserRepository
 from .url import URLRepository
+from .user import UserRepository
 
 __all__ = (
     "UserRepository",

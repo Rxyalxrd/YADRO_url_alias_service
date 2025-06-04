@@ -2,11 +2,10 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     auth_router,
-    url_router,
+    redirect_router,
     statistic_router,
-    redirect_router
+    url_router,
 )
-
 
 main_router = APIRouter()
 

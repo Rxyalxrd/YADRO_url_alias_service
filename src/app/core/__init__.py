@@ -1,10 +1,5 @@
+from .db import AsyncSessionLocal, Base, get_async_session
 from .settings import settings
-from .db import (
-    get_async_session,
-    Base,
-    AsyncSessionLocal,
-)
-
 
 __all__ = (
     "Base",

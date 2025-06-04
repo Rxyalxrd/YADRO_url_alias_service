@@ -5,14 +5,14 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import (
+    login_user,
+    register_user,
+)
 from app.core import get_async_session
 from app.schemas import (
     RegisterRequest,
     TokenResponse,
-)
-from app.auth import (
-    login_user,
-    register_user,
 )
 
 

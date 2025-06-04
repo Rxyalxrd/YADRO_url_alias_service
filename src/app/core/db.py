@@ -1,15 +1,8 @@
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.ext.asyncio import (
-	AsyncSession,
-	create_async_engine,
-	async_sessionmaker,
-)
-from sqlalchemy.orm import (
-    declared_attr,
-    as_declarative,
-)
+from sqlalchemy.ext.asyncio import (AsyncAttrs, AsyncSession,
+                                    async_sessionmaker, create_async_engine)
+from sqlalchemy.orm import as_declarative, declared_attr
 
 from app.core.settings import settings
 

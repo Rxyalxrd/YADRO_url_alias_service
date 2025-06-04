@@ -1,14 +1,14 @@
 import asyncio
 from logging.config import fileConfig
 
+from pydantic import ValidationError
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from pydantic import ValidationError
-from alembic import context
 
+import app.models  # noqa: F401
+from alembic import context
 from app.core import Base, settings
-import app.models # noqa: F401
 
 config = context.config
 

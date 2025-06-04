@@ -1,13 +1,13 @@
 from fastapi import status
 from fastapi.exceptions import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dao import UserRepository
 from app.auth.validators import (
-    verify_password,
     create_access_token,
+    verify_password,
 )
+from app.dao import UserRepository
 
 
 async def login_user(

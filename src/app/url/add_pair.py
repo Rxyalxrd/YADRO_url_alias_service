@@ -2,12 +2,12 @@ from fastapi import (
     HTTPException,
     status,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
+from loguru import logger
 from pydantic import HttpUrl
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao import URLRepository
 from app.models import URLPair
-from loguru import logger
 
 
 async def add_pair(

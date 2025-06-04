@@ -1,12 +1,12 @@
 from typing import Sequence
 
 from pydantic import HttpUrl
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
-    select,
     exists,
+    select,
     update,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import (
     URLPair,
